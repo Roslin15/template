@@ -1,0 +1,130 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: Usage template
+  description: Usage template APIs
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: /
+paths:
+  /authExample/any:
+    get:
+      description: |
+        example of AuthService.accessTokenOrPullSecretOrEntitlementKeyAuthenticator
+      operationId: authExampleAny
+      x-eov-operation-handler: auth-example
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /authExample/accessToken:
+    get:
+      description: |
+        example of AuthService.accessTokenAuthenticator
+      operationId: authExampleAccessToken
+      x-eov-operation-handler: auth-example
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /authExample/pullSecret:
+    get:
+      description: |
+        example of AuthService.pullSecretOrEntitlementKeyAuthenticator
+      operationId: authExamplePullSecretOrEntitlementKey
+      x-eov-operation-handler: auth-example
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /authExample/superUser:
+    get:
+      description: |
+        example of AuthService.superUserAuthenticator
+      operationId: authExampleSuperUser
+      x-eov-operation-handler: auth-example
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /authExample/none:
+    get:
+      description: |
+        example of endpoint with no authentication
+      operationId: authExampleNone
+      x-eov-operation-handler: auth-example
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      required:
+        - errorCode
+        - message
+      properties:
+        errorCode:
+          oneOf:
+            - type: string
+            - type: number
+        message:
+          oneOf:
+            - type: string
+            - type: number
+        details:
+          type: object
