@@ -7,7 +7,7 @@ mv tmp.json .vault-manifest.json
 
 # Get secrets from vault
 ## Inject build-time variables into environment
-source ./node_modules/.bin/read_vault_env.sh plato
+source ./node_modules/.bin/read_sm_env.sh
 
 # Build the image
 ./node_modules/.bin/build_docker_image.sh

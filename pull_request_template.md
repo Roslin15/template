@@ -12,16 +12,16 @@ For: https://github.ibm.com/symposium/track-and-plan/issues/<INSERT ISSUE NUMBER
 - [ ] API docs updated
 - [ ] README updates
 
-**What changed**
--
+## **What changed**
 
 **How to test**
+
 1.
 
 **Commits squashed:**
-Note reset is on `master` branch
+Note reset is on `stage` branch
 
 - git checkout yourBranch
-- git reset $(git merge-base origin/master $(git branch --show-current))
+- git reset $(git merge-base origin/stage $(git branch --show-current))
 - git add -A
 - git commit -m "fix: updated with new function"

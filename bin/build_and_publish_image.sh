@@ -7,7 +7,7 @@ mv tmp.json .vault-manifest.json
 
 # Get secrets from vault
 ## Inject build-time variables into environment
-source ./node_modules/.bin/read_vault_env.sh plato
+source ./node_modules/.bin/read_sm_env.sh
 
 # Tags and publish docker image
 ## Determines version using semantic-release, publishes it to Github Releases

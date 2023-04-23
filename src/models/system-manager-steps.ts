@@ -1,65 +1,60 @@
 import { ExchangeQueue, MessagingBindingAndRouting, SystemManagerStepDefinition } from '@symposium/usage-common';
-// These values are to be defined by services using the system mamager
 
-// Create enums defining names
-enum ExchangeNames {
-  EXCHANGE_TEMPLATE_STEP = 'template-exchange-step',
-  EXCHANGE_TEMPLATE_NEXT = 'template-exchange-next',
-}
-enum QueueNames {
-  QUEUE_TEMPLATE_ENRICH = 'template-queue-enrich',
-  QUEUE_TEMPLATE_NEXT = 'template-queue-next',
-  QUEUE_TEMPLATE_FAIL = 'template-queue-fail',
+export enum ExchangeNames {
+  EXCHANGE_API_TO_ROUTER = 'api-to-router-exchange',
 }
 
-export enum ExchangeQueueGroupNames { // not a step name but what they are being used
-  MOCK_STEP_GROUP = 'mockStepGroup',
-  MOCK_NEXT_STEP_GROUP = 'mockNextGroup',
-  MOCK_FAIL_STEP_GROUP = 'mockFailGroup',
+export enum QueueNames {
+  QUEUE_API_ROUTING = 'api-routing',
+  QUEUE_API_IASP = 'api-iasp',
+  QUEUE_API_REPLAY = 'api-replay',
 }
 
-// Create groupings
+export enum ExchangeQueueGroupNames {
+  GROUP_SEND_TO_ROUTER = 'Routing',
+  GROUP_SEND_TO_ROUTER_IASP = 'IASP',
+  GROUP_SEND_TO_ROUTER_FOR_REPLAY = 'Replay',
+}
+
 export const exchangeQueueMap: Map<ExchangeQueueGroupNames, ExchangeQueue> = new Map([
   [
-    ExchangeQueueGroupNames.MOCK_STEP_GROUP,
+    ExchangeQueueGroupNames.GROUP_SEND_TO_ROUTER,
     {
-      exchangeName: ExchangeNames.EXCHANGE_TEMPLATE_STEP,
+      exchangeName: ExchangeNames.EXCHANGE_API_TO_ROUTER,
       exchangeType: 'topic',
-      queueName: QueueNames.QUEUE_TEMPLATE_ENRICH,
-      routingNamespace: MessagingBindingAndRouting.ENRICH,
+      queueName: QueueNames.QUEUE_API_ROUTING,
+      routingNamespace: MessagingBindingAndRouting.ROUTE,
     },
   ],
   [
-    ExchangeQueueGroupNames.MOCK_NEXT_STEP_GROUP,
+    ExchangeQueueGroupNames.GROUP_SEND_TO_ROUTER_IASP,
     {
-      exchangeName: ExchangeNames.EXCHANGE_TEMPLATE_NEXT,
+      exchangeName: ExchangeNames.EXCHANGE_API_TO_ROUTER,
       exchangeType: 'topic',
-      queueName: QueueNames.QUEUE_TEMPLATE_NEXT,
-      routingNamespace: MessagingBindingAndRouting.ENRICH,
+      queueName: QueueNames.QUEUE_API_IASP,
+      routingNamespace: MessagingBindingAndRouting.IASP,
     },
   ],
   [
-    ExchangeQueueGroupNames.MOCK_FAIL_STEP_GROUP,
+    ExchangeQueueGroupNames.GROUP_SEND_TO_ROUTER_FOR_REPLAY,
     {
-      exchangeName: ExchangeNames.EXCHANGE_TEMPLATE_NEXT,
+      exchangeName: ExchangeNames.EXCHANGE_API_TO_ROUTER,
       exchangeType: 'topic',
-      queueName: QueueNames.QUEUE_TEMPLATE_FAIL,
-      routingNamespace: MessagingBindingAndRouting.FAIL,
+      queueName: QueueNames.QUEUE_API_REPLAY,
+      routingNamespace: MessagingBindingAndRouting.REPLAY,
     },
   ],
 ]);
 
-// note: would need the other groups added to this map
-
-// Create the definiton mapping each step to it's consumer and producer groups
 export const systemManagerStepDefinitionMap: Map<string, SystemManagerStepDefinition> = new Map([
   [
-    'MockStep',
+    'SendToRouterStep',
     {
-      consumerExchangeQueueGroupName: ExchangeQueueGroupNames.MOCK_STEP_GROUP,
+      consumerExchangeQueueGroupName: undefined,
       producerExchangeQueueGroupNames: [
-        ExchangeQueueGroupNames.MOCK_NEXT_STEP_GROUP,
-        ExchangeQueueGroupNames.MOCK_FAIL_STEP_GROUP,
+        ExchangeQueueGroupNames.GROUP_SEND_TO_ROUTER,
+        ExchangeQueueGroupNames.GROUP_SEND_TO_ROUTER_FOR_REPLAY,
+        ExchangeQueueGroupNames.GROUP_SEND_TO_ROUTER_IASP,
       ],
     },
   ],

@@ -1,38 +1,54 @@
-// Each repo will update this file to create it's own configuration index
-
-import { ConfigByEnvironment, Environments, stringToEnvironment } from '@symposium/usage-common';
-
+import { ConfigByEnvironment, stringToEnvironment } from '@symposium/usage-common';
 export interface ConfigSettings {
   PORT: string;
-  EXAMPLE?: string;
+  INCOMING_MESSAGE_QUEUE_BUCKET: string;
+  ARCHIVE_BUCKET: string;
+  IASP_ARCHIVE_BUCKET: string;
+  EXISTING_STATUS_DELAY: number;
   // DO NOT INCLUDE DeP or shared configs - should be in common
   // specific to service
   // etc..
 }
 
 const configDefaultSettings: ConfigByEnvironment<ConfigSettings> = {
-  [Environments.DEV]: {
-    PORT: '4000',
-    EXAMPLE: 'Default example string to be replaced',
+  dev: {
+    PORT: '4001',
+    INCOMING_MESSAGE_QUEUE_BUCKET: 'test-bucket-incoming-api',
+    ARCHIVE_BUCKET: `test-bucket-archive`,
+    IASP_ARCHIVE_BUCKET: 'test-bucket-iasp-archive',
+    EXISTING_STATUS_DELAY: 500,
   },
-  [Environments.TEST]: {
-    PORT: '4000',
-    EXAMPLE: 'Default example string to be replaced',
+  test: {
+    PORT: '4001',
+    INCOMING_MESSAGE_QUEUE_BUCKET: 'test-bucket-incoming-api',
+    ARCHIVE_BUCKET: 'test-bucket-archive',
+    IASP_ARCHIVE_BUCKET: 'test-bucket-iasp-archive',
+    EXISTING_STATUS_DELAY: 500,
   },
-  [Environments.STAGE]: {
-    PORT: '4000',
-    EXAMPLE: undefined,
+  stage: {
+    PORT: '4001',
+    INCOMING_MESSAGE_QUEUE_BUCKET: 'rhm-usage-incoming-api-sandbox',
+    ARCHIVE_BUCKET: `rhm-usage-archive-sandbox`,
+    IASP_ARCHIVE_BUCKET: 'rhm-usage-iasp-archive-sandbox',
+    EXISTING_STATUS_DELAY: 500,
   },
-  [Environments.PROD]: {
-    PORT: '4000',
-    EXAMPLE: undefined,
+  prod: {
+    PORT: '4001',
+    INCOMING_MESSAGE_QUEUE_BUCKET: 'rhm-usage-incoming-api',
+    ARCHIVE_BUCKET: 'rhm-usage-archive',
+    IASP_ARCHIVE_BUCKET: 'rhm-usage-iasp-archive',
+    EXISTING_STATUS_DELAY: 500,
   },
 };
 
 export const getConfig = (env = stringToEnvironment(process.env.ENV)): ConfigSettings => {
-  const serviceConfig: ConfigSettings = {
+  return {
     PORT: process.env.PORT || configDefaultSettings[env].PORT,
-    EXAMPLE: process.env.EXAMPLE || configDefaultSettings[env].EXAMPLE,
+    INCOMING_MESSAGE_QUEUE_BUCKET:
+      process.env.INCOMING_MESSAGE_QUEUE_BUCKET || configDefaultSettings[env].INCOMING_MESSAGE_QUEUE_BUCKET,
+    ARCHIVE_BUCKET: process.env.ARCHIVE_BUCKET || configDefaultSettings[env].ARCHIVE_BUCKET,
+    IASP_ARCHIVE_BUCKET: process.env.IASP_ARCHIVE_BUCKET || configDefaultSettings[env].IASP_ARCHIVE_BUCKET,
+    EXISTING_STATUS_DELAY:
+      Number(process.env.EXISTING_STATUS_DELAY) || configDefaultSettings[env].EXISTING_STATUS_DELAY,
   };
-  return serviceConfig;
 };

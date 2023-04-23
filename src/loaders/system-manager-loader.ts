@@ -1,6 +1,6 @@
 import { logger, SystemManager } from '@symposium/usage-common';
 import { exchangeQueueMap, systemManagerStepDefinitionMap } from '../models/system-manager-steps';
-import { MockStep } from '../steps/MockStep';
+import { SendToRouterStep } from '../steps/send-to-router-step';
 import { rabbitMQConnectionManager } from './rabbitmq-loader';
 
 export const systemManagerLoader = async () => {
@@ -16,6 +16,6 @@ export const systemManagerLoader = async () => {
 export const systemManagerInstance: SystemManager = new SystemManager(
   systemManagerStepDefinitionMap,
   exchangeQueueMap,
-  [MockStep],
+  [SendToRouterStep],
   rabbitMQConnectionManager
 );

@@ -1,9 +1,15 @@
 import { getReadinessStatus } from '../../../src/api/routes/readiness';
-import { Request, Response } from 'express';
-import { mongoImpl, tenantInstance } from '@symposium/usage-common';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { accountHealthInstance } from '../../../src/loaders/account-health-loader';
 import { cosHandlerInstance } from '../../../src/loaders/cos-loader';
+import { esmHealthInstance } from '../../../src/loaders/esm-health-loader';
 import { rabbitMQConnectionManager } from '../../../src/loaders/rabbitmq-loader';
+import { mongoImpl, tenantInstance } from '@symposium/usage-common';
+import { Request, Response } from 'express';
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+
+jest.mock('../../../src/loaders/account-health-loader', () => ({
+  accountHealthInstance: { health: jest.fn() },
+}));
 
 describe('Readiness check', () => {
   const status = jest.fn();
@@ -15,16 +21,12 @@ describe('Readiness check', () => {
     res.send = send;
     return res;
   };
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-    jest.clearAllMocks();
-  });
-
   test('Ready', async () => {
     cosHandlerInstance.health = jest.fn().mockResolvedValueOnce(true);
     mongoImpl.health = jest.fn().mockResolvedValueOnce(true);
     tenantInstance.health = jest.fn().mockResolvedValueOnce(true);
+    esmHealthInstance.health = jest.fn().mockResolvedValueOnce(true);
+    accountHealthInstance.health = jest.fn().mockResolvedValueOnce(true);
     rabbitMQConnectionManager.health = jest.fn().mockResolvedValueOnce(true);
     await getReadinessStatus(mockReq, mockRes());
     expect(status).toBeCalledWith(StatusCodes.OK);
@@ -35,6 +37,8 @@ describe('Readiness check', () => {
     cosHandlerInstance.health = jest.fn().mockResolvedValueOnce(false);
     mongoImpl.health = jest.fn().mockResolvedValueOnce(false);
     tenantInstance.health = jest.fn().mockResolvedValue(false);
+    esmHealthInstance.health = jest.fn().mockResolvedValueOnce(false);
+    accountHealthInstance.health = jest.fn().mockResolvedValueOnce(false);
     rabbitMQConnectionManager.health = jest.fn().mockResolvedValueOnce(false);
     await getReadinessStatus(mockReq, mockRes());
     expect(status).toBeCalledWith(StatusCodes.SERVICE_UNAVAILABLE);
@@ -54,7 +58,9 @@ describe('Readiness check', () => {
     cosHandlerInstance.health = jest.fn().mockResolvedValueOnce(true);
     mongoImpl.health = jest.fn().mockResolvedValueOnce(false);
     tenantInstance.health = jest.fn().mockResolvedValue(true);
-    rabbitMQConnectionManager.health = jest.fn().mockResolvedValueOnce(true);
+    esmHealthInstance.health = jest.fn().mockResolvedValueOnce(true);
+    accountHealthInstance.health = jest.fn().mockResolvedValueOnce(true);
+    rabbitMQConnectionManager.health = jest.fn().mockResolvedValue(true);
     await getReadinessStatus(mockReq, mockRes());
     expect(flushSpy).toHaveBeenCalled();
     expect(status).toBeCalledWith(StatusCodes.SERVICE_UNAVAILABLE);

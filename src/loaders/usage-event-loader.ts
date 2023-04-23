@@ -2,14 +2,12 @@ import { UsageEventCollection, logger } from '@symposium/usage-common';
 
 export const usageEventLoader = () => {
   try {
-    logger.verbose('usageEventLoader usageEvent Handler being loaded');
+    logger.verbose(`usageEventLoader UsageEvent handler being loaded`);
     return new UsageEventCollection();
   } catch (e) {
-    /* istanbul ignore next */
-    logger.error('usageEventLoader usageEventHandler failed to load on startup', e);
-    /* istanbul ignore next */
+    logger.error(`usageEventLoader UsageEvent failed to load at startup`, e);
     throw e;
   }
 };
 
-export const usageEventHandlerInstance: UsageEventCollection = usageEventLoader();
+export const usageEventHandlerInstance = usageEventLoader();

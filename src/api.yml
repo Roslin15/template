@@ -1,118 +1,699 @@
 openapi: '3.0.0'
 info:
   version: 1.0.0
-  title: Usage template
-  description: Usage template APIs
+  title: Usage api
+  description: Usage api service APIs
   termsOfService: http://swagger.io/terms/
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: /
+  - url: /metering
 paths:
-  /authExample/any:
-    get:
+  /api/v1/metrics:
+    post:
       description: |
-        example of AuthService.accessTokenOrPullSecretOrEntitlementKeyAuthenticator
-      operationId: authExampleAny
-      x-eov-operation-handler: auth-example
+        post metrics v1
+      operationId: postMetricsV1
+      x-eov-operation-handler: metrics-v1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  description: Contains an array of events for processing
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Event'
+                  minItems: 1
+          application/json; utf-8:
+            schema:
+              type: object
+              properties:
+                data:
+                  description: Contains an array of events for processing
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Event'
+                  minItems: 1
       responses:
-        '200':
-          description: OK
+        '202':
+          description: accepted
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: OK
+                type: object
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /authExample/accessToken:
+  /api/v1/metrics/{id}:
     get:
       description: |
-        example of AuthService.accessTokenAuthenticator
-      operationId: authExampleAccessToken
-      x-eov-operation-handler: auth-example
+        get status of v1 metrics
+      operationId: getV1MetricsService
+      x-eov-operation-handler: status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: requestId or correlationId of v1 metrics to get status for
+        - in: query
+          name: accountOrPrefix
+          schema:
+            type: string
+          required: false
+          description: accountId or COS prefix associated with the request. If left empty, will look in the default bucket and only for requests with a null accountId.
       responses:
-        '200':
-          description: OK
+        '202':
+          description: status report of the v1 metric
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: OK
+                $ref: '#/components/schemas/V1Response'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /authExample/pullSecret:
+  /v1/status/correlationId/{correlationId}:
     get:
       description: |
-        example of AuthService.pullSecretOrEntitlementKeyAuthenticator
-      operationId: authExamplePullSecretOrEntitlementKey
-      x-eov-operation-handler: auth-example
+        get status using correlationId
+      operationId: getStatusServiceByCorrelationId
+      x-eov-operation-handler: status
+      parameters:
+        - in: path
+          name: correlationId
+          schema:
+            type: string
+          required: true
+          description: correlationId for fetching status
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/Detailed'
+        - $ref: '#/components/parameters/AccountOrPrefix'
       responses:
         '200':
-          description: OK
+          description: all success status report
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: OK
+                $ref: '#/components/schemas/StatusRequestResponse'
+        '207':
+          description: multi status report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusRequestResponse'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /authExample/superUser:
+  /v1/status/requestId/{requestId}:
     get:
       description: |
-        example of AuthService.superUserAuthenticator
-      operationId: authExampleSuperUser
-      x-eov-operation-handler: auth-example
+        get status using requestId
+      operationId: getStatusServiceByRequestId
+      x-eov-operation-handler: status
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: string
+          required: true
+          description: requestId for fetching status
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/Detailed'
+        - $ref: '#/components/parameters/AccountOrPrefix'
       responses:
         '200':
-          description: OK
+          description: all success status report
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: OK
+                $ref: '#/components/schemas/StatusRequestResponse'
+        '207':
+          description: multi status report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusRequestResponse'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /authExample/none:
+  /v1/status/usageEventId/{usageEventId}:
     get:
       description: |
-        example of endpoint with no authentication
-      operationId: authExampleNone
-      x-eov-operation-handler: auth-example
+        get status using usageEventId
+      operationId: getStatusServiceByUsageEventId
+      x-eov-operation-handler: status
+      parameters:
+        - in: path
+          name: usageEventId
+          schema:
+            type: string
+          required: true
+          description: usageEventId for fetching status
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/Detailed'
+        - $ref: '#/components/parameters/AccountOrPrefix'
       responses:
         '200':
-          description: OK
+          description: all success status report
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: OK
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatusByUsageEventId'
+        '207':
+          description: multi status report
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatusByUsageEventId'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /status/aborted/v1:
+    get:
+      description: |
+        get all aborted statuses. Only superusers can call this API.
+      operationId: getAbortedStatus
+      x-eov-operation-handler: status
+      parameters:
+        - in: query
+          name: eventIdPresent
+          schema:
+            type: string
+          required: false
+          description: If not provided returns all aborted statuses. If set to true will only return event statuses. When false returns only request statuses.
+        - in: query
+          name: tenant
+          schema:
+            type: string
+          required: false
+          description: when not provided targets default db. If provided fetches aborted status from given tenant db.
+      responses:
+        '200':
+          description: all aborted status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Status'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v2/metrics:
+    post:
+      description: |
+        post metrics
+      operationId: postMetrics
+      x-eov-operation-handler: metrics-v2
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '202':
+          description: accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accepted'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v2/metrics/{id}:
+    get:
+      description: |
+        get status for upload by requestId
+      operationId: getUploadStatus
+      x-eov-operation-handler: status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: requestId or correlationId of upload to get status for
+        - $ref: '#/components/parameters/AccountOrPrefix'
+        - $ref: '#/components/parameters/Detailed'
+      responses:
+        '200':
+          description: status report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadStatus'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/report/iasp/{reportUrn}:
+    post:
+      description: |
+        upload report for iasp
+      operationId: postReportIASP
+      x-eov-operation-handler: iasp-report
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: string
+          required: true
+          description: account associated with the report
+        - in: query
+          name: startDate
+          schema:
+            type: number
+          required: false
+          description: Start date for the report (ms since epoch). If provided, endDate is mandatory
+        - in: query
+          name: endDate
+          schema:
+            type: number
+          required: false
+          description: End date for the report (ms since epoch). If provided, startDate is mandatory
+        - in: path
+          name: reportUrn
+          schema:
+            type: integer
+          required: true
+          description: unique identifer for this report. To amend an existing report, submit a new report with the same reportUrn.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '202':
+          description: report accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accepted'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      description: |
+        download report for iasp
+      operationId: getIaspReport
+      x-eov-operation-handler: iasp-report
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: string
+          description: account associated with the report. Must be passed for reportUrn value other than 'template'.
+        - in: path
+          name: reportUrn
+          schema:
+            type: string
+          required: true
+          description: unique identifer for the report
+      responses:
+        '200':
+          description: 'report file'
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/replay:
+    post:
+      description: |
+        Replay metrics - reprocess a set of usage files as if they were just uploaded. The files to be replayed are identified by an array of requestId's and eventId's. Only superusers can call this API.
+      operationId: handleReplayArray
+      x-eov-operation-handler: replay
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              maxItems: 1000
+              uniqueItems: true
+              items:
+                type: object
+                properties:
+                  requestId:
+                    description: Unique ID for a request. Identifies the request to be replayed.
+                    type: string
+                    pattern: '^[\da-f]{64}$'
+                  eventId:
+                    description: ID for an event. If provided, only replays this event from the request.
+                    type: string
+                  accountOrPrefix:
+                    description: Specifies the Tenant containing the request. If this field is not specified, the default Tenant will be used.
+                    type: string
+                    nullable: true
+                required:
+                  - requestId
+      responses:
+        '202':
+          description: all accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplayAccepted'
+        '207':
+          description: partially accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplayAccepted'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/usageevent:
+    post:
+      description: Super user access to usage event collection. You can fetch usage event by providing id or statusId or combination of usage event id and accountId.
+      operationId: getUsageEvent
+      x-eov-operation-handler: usage-events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                accountOrPrefix:
+                  type: string
+                statusId:
+                  type: string
+                eventId:
+                  type: string
+      responses:
+        '200':
+          description: Usage Event object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsageEvent'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/tenant:
+    post:
+      description: create the Tenants
+      operationId: createTenant
+      x-eov-operation-handler: tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tenant'
+      responses:
+        '202':
+          description: accepted
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      description: gets details of all tenants
+      operationId: getAllTenants
+      x-eov-operation-handler: tenant
+      responses:
+        '200':
+          description: Gets all tenants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tenant'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v1/tenant/{accountOrPrefix}:
+    delete:
+      description: deletes tenant record with given id
+      operationId: deleteTenant
+      x-eov-operation-handler: tenant
+      parameters:
+        - in: path
+          name: accountOrPrefix
+          schema:
+            type: string
+          required: true
+          description: accountOrPrefix of the record
+      responses:
+        '200':
+          description: deletes tenant record
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/replay/batch:
+    post:
+      description: Replay batch - reprocess a set of usage events received during given timestamp. If limit is specified, it limits the number of usage events. Only superusers can call this API.
+      operationId: handleReplayBatch
+      x-eov-operation-handler: replay
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchReplay'
+      responses:
+        '202':
+          description: all success
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
+    Tenant:
+      required:
+        - accountOrPrefix
+        - name
+        - type
+      properties:
+        accountOrPrefix:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - accountId
+            - cosPrefix
+          default: accountId
+        rhmTest:
+          type: boolean
+          default: true
+    StatusRequestResponse:
+      required:
+        - status
+        - eventStatus
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+        statusStep:
+          items:
+            $ref: '#/components/schemas/StatusStep'
+        eventStatus:
+          type: array
+          items:
+            type: object
+            properties:
+              eventId:
+                type: string
+              status:
+                type: string
+            required:
+              - eventId
+              - status
+    StatusByUsageEventId:
+      required:
+        - status
+        - usageEvent
+      properties:
+        status:
+          type: object
+        statusStep:
+          type: array
+          items:
+            type: object
+        usageEvent:
+          type: object
+          properties:
+            usage:
+              type: object
+              properties:
+                eventId:
+                  type: string
+              additionalProperties: true
+              required:
+                - eventId
+            enrichment:
+              type: object
+            metrics:
+              type: array
+              items:
+                type: object
+    Accepted:
+      required:
+        - requestId
+      properties:
+        requestId:
+          type: string
+    UploadStatus:
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          enum:
+            - success
+            - inprogress
+            - failed
+            - multiStatus
+        message:
+          type: string
+        detailed:
+          $ref: '#/components/schemas/DetailedStatus'
+        errorCode:
+          type: string
+    V1Response:
+      required:
+        - status
+        - message
+        - data
+      properties:
+        status:
+          type: string
+          enum:
+            - accepted
+            - inprogress
+            - failed
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - accepted
+                  - inprogress
+                  - failed
+                  - unauthorized
+              batchId:
+                type: string
+              payload:
+                type: object
+    ReplayAccepted:
+      description: Array of responses, one for each requestId/eventId, indicating whether it was successfully started or failed. If the overall status code is 207, then only some replays were successfully started.
+      type: array
+      items:
+        type: object
+        properties:
+          requestId:
+            description: Unique ID for the request.
+            type: string
+            pattern: '^[\da-f]{64}$'
+          eventId:
+            description: Event ID replayed.
+            type: string
+          accountOrPrefix:
+            description: Identifies the Tenant containing the request.
+            type: string
+            nullable: true
+          httpCode:
+            description: True if this request will be replayed. False if for any reason we could not replay.
+            type: number
+        required:
+          - requestId
+          - httpCode
     Error:
       required:
         - errorCode
@@ -128,3 +709,204 @@ components:
             - type: number
         details:
           type: object
+    DetailedStatus:
+      $ref: '#/components/schemas/Status'
+      statusSteps:
+        type: array
+        items:
+          $ref: '#/components/schemas/StatusStep'
+    Status:
+      required:
+        - requestId
+        - requestType
+        - inputFileName
+        - startTime
+        - replayAttempt
+      properties:
+        id:
+          type: string
+        correlationId:
+          type: string
+        requestId:
+          type: string
+        requestType:
+          type: string
+        replayAttempt:
+          type: number
+        inputFileName:
+          type: string
+        startTime:
+          type: number
+        endTime:
+          type: number
+        accountId:
+          type: string
+        accountOrPrefix:
+          type: string
+          nullable: true
+        eventId:
+          type: string
+          nullable: true
+        type:
+          type: string
+        userResponseReturned:
+          type: boolean
+        finalResult:
+          type: string
+        status:
+          type: string
+        errorCode:
+          type: string
+          nullable: true
+        errorResponseMessage:
+          type: string
+          nullable: true
+      additionalProperties: true
+    StatusStep:
+      required:
+        - statusId
+        - action
+        - startTime
+        - attempt
+        - replayAttempt
+        - state
+      properties:
+        id:
+          type: string
+        statusId:
+          type: string
+        action:
+          type: string
+        startTime:
+          type: number
+        endTime:
+          type: number
+        attempt:
+          type: number
+        replayAttempt:
+          type: number
+        state:
+          type: string
+        message:
+          type: string
+          nullable: true
+        errorCode:
+          type: string
+          nullable: true
+    Event:
+      properties:
+        start:
+          type: integer
+          description: A start time in UTC milliseconds.
+        end:
+          type: integer
+          description: A stop time in UTC milliseconds.
+        subscriptionId:
+          type: string
+          description: The subscription identifier for the usage being submitted.
+        eventId:
+          type: string
+          description: SHOULD use a string following the GUID format. Each unique event must have a unique value sent in by the API consumer
+        additionalAttributes:
+          type: object
+          description: Object with attributes and values. Holds metadata regarding the event. This is an open section where necessary attributes can be added. Some specific properties will be used by the platform such as pod and namespace
+        measuredUsage:
+          type: array
+          uniqueItems: true
+          items:
+            type: object
+            description: Contains a list of measures. Each measure consists of a measure string and quantify value.
+            properties:
+              metricId:
+                type: string
+                description: Vendor's metricId. An identifier that is used to match the unit of measure in billing. Two objects of measuredUsage MUST not contain the same metricId
+              value:
+                type: number
+                description: Depending on the measure, the value could represent an integer value like a count or a double value like an average
+            required:
+              - metricId
+              - value
+            additionalProperties: false
+      required:
+        - start
+        - end
+        - eventId
+        - measuredUsage
+    UsageEvent:
+      required:
+        - statusId
+        - usage
+        - enrichment
+      properties:
+        id:
+          type: string
+        statusId:
+          type: string
+        accountOrPrefix:
+          type: string
+          nullable: true
+        usage:
+          type: object
+          properties:
+            eventId:
+              type: string
+          additionalProperties: true
+          required:
+            - eventId
+        enrichment:
+          $ref: '#/components/schemas/Enrichment'
+    Enrichment:
+      properties:
+        isAmendment:
+          type: boolean
+        productId:
+          type: string
+        editionId:
+          type: string
+        isTestSubscription:
+          type: boolean
+        isIBMProduct:
+          type: boolean
+      additionalProperties: true
+    BatchReplay:
+      required:
+        - start
+      properties:
+        start:
+          type: number
+        end:
+          type: number
+        accountId:
+          type: string
+        accountOrPrefix:
+          type: string
+        isAborted:
+          type: boolean
+        limit:
+          type: number
+        requestReplays:
+          type: boolean
+          default: false
+      additionalProperties: false
+  parameters:
+    AccountOrPrefix:
+      in: query
+      name: accountOrPrefix
+      schema:
+        type: string
+      required: false
+      description: accountId or COS prefix associated with the request. If left empty, will look in the default bucket and only for requests with a null accountId.
+    AccountId:
+      in: query
+      name: accountId
+      schema:
+        type: string
+      required: false
+      description: accountId associated with the request.
+    Detailed:
+      in: query
+      name: detailed
+      schema:
+        type: string
+      required: false
+      description: flag to return detailed response. Superusers only

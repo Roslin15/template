@@ -1,11 +1,11 @@
 {
-  "name": "@symposium/usage-template",
+  "name": "@symposium/usage-api",
   "version": "0.0.1",
-  "description": "ConMan usage microservice template",
+  "description": "ConMan usage api microservice",
   "main": "dist/src/server.js",
   "repository": {
     "type": "git",
-    "url": "git@github.ibm.com:symposium/usage-template.git"
+    "url": "git@github.ibm.com:symposium/usage-api.git"
   },
   "author": "Consumption Management (rhmcm@us.ibm.com)",
   "license": "unlicensed",
@@ -22,35 +22,42 @@
     "format": "prettier --write --no-error-on-unmatched-pattern '**/*.json' '**/*.js' '**/*.ts' '**/*.yml'",
     "semantic-release": "semantic-release --debug",
     "publish": "npm run semantic-release",
-    "eslint": "eslint . --ext .js,.ts",
+    "eslint": "eslint . --ext .js,.tsx,.ts",
     "pre:test": "npm run format && npm run eslint"
   },
   "dependencies": {
-    "@instana/collector": "^2.14.1",
-    "@symposium/usage-common": "^0.95.2",
+    "@instana/collector": "^2.20.2",
+    "@symposium/usage-common": "^0.100.27",
     "express": "^4.18.2",
-    "express-openapi-validator": "^5.0.1",
+    "express-openapi-validator": "^5.0.3",
+    "file-type": "^16.5.4",
     "http-errors": "^2.0.0",
-    "http-status-codes": "^2.2.0"
+    "http-status-codes": "^2.2.0",
+    "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
-    "@symposium/scripts": "^7.0.1",
-    "@types/express": "^4.17.15",
-    "@types/jest": "^29.2.5",
-    "@typescript-eslint/eslint-plugin": "^5.48.1",
-    "@typescript-eslint/parser": "^5.48.1",
+    "@symposium/scripts": "^7.1.1",
+    "@types/express": "^4.17.17",
+    "@types/http-errors": "^2.0.1",
+    "@types/jest": "^29.5.0",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
     "dotenv": "^16.0.3",
-    "eslint": "^8.31.0",
+    "eslint": "^8.38.0",
+    "eslint-config-standard": "^17.0.0",
     "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "jest": "^29.3.1",
-    "jest-html-reporter": "^3.7.0",
-    "prettier": "^2.8.2",
+    "jest": "^29.5.0",
+    "jest-html-reporter": "^3.7.1",
+    "prettier": "^2.8.7",
     "semantic-release": "^19.0.5",
-    "ts-jest": "^29.0.4",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   },
   "jest": {
     "verbose": true,
@@ -86,7 +93,7 @@
     "testResultsProcessor": "./node_modules/jest-html-reporter"
   },
   "jest-html-reporter": {
-    "pageTitle": "ConMan Test Results",
+    "pageTitle": "ConMan Usage-api Test Results",
     "outputPath": "<rootDir>/coverage/test-results-report.html",
     "includeFailureMsg": true
   }

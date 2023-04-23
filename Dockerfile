@@ -1,5 +1,5 @@
 # Create intermediate image for testing & building app
-FROM docker-na.artifactory.swg-devops.com/dbg-m-symposium-docker-local/ubi8-nodejs-16 AS build
+FROM docker-na.artifactory.swg-devops.com/dbg-m-symposium-docker-local/ubi8-nodejs-16.19 AS build
 
 USER 1001:0
 
@@ -17,7 +17,11 @@ RUN npm ci && \
 
 
 # Create final image for publishing & deploying using intermediate build
-FROM docker-na.artifactory.swg-devops.com/dbg-m-symposium-docker-local/ubi8-nodejs-16-minimal
+FROM docker-na.artifactory.swg-devops.com/dbg-m-symposium-docker-local/ubi8-nodejs-16.19-minimal
+
+# workaround for npm cache issue that came up when moving from node 16.16.0 to 16.17.1
+USER root
+RUN rm -Rf /opt/app-root/src/.npm-global /opt/app-root/src/.npm
 
 USER 1001:0
 
@@ -32,7 +36,7 @@ WORKDIR /home/app
 RUN chgrp -R 0 /home/app && \
     chmod -R g=u /home/app
 
-ENV NODE_OPTIONS="--require /home/app/node_modules/@instana/collector/src/immediate --max-http-header-size 16384"
+ENV NODE_OPTIONS="--require /home/app/node_modules/@instana/collector/src/immediate"
 ENV NO_UPDATE_NOTIFIER=true
 
 # match port exposed by app & in .travis.yml

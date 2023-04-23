@@ -6,10 +6,8 @@ envsubst < .vault-manifest.json > tmp.json
 mv tmp.json .vault-manifest.json
 
 # Get secrets from vault
-## Inject build-time variables into environment
-source ./node_modules/.bin/read_vault_env.sh plato
-## Inject run-time variables into environment
-source ./node_modules/.bin/read_vault_env.sh plato secrets.env
+## Inject build-time and run-time variables into environment
+source ./node_modules/.bin/read_sm_env.sh secrets.env
 
 # Extract runtime vars from local env injected from Travis build stage and vault.
 # Store in an env file (used by pods when deployed)
